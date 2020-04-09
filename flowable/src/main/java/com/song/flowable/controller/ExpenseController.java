@@ -3,13 +3,18 @@ package com.song.flowable.controller;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.*;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.image.ProcessDiagramGenerator;
@@ -20,14 +25,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 报销demoController
- *
- * @author puhaiyang
- * @date 2018/12/19
+* 测试业务代码
  */
 @Controller
 @RequestMapping(value = "expense")
 public class ExpenseController {
+
     @Autowired
     private RuntimeService runtimeService;
     @Autowired
@@ -37,7 +40,6 @@ public class ExpenseController {
     @Autowired
     private ProcessEngine processEngine;
 
-/***************此处为业务代码******************/
     /**
      * 添加报销
      *
@@ -64,10 +66,12 @@ public class ExpenseController {
     public Object list(String userId) {
         List<Task> tasks = taskService.createTaskQuery().taskAssignee(userId).orderByTaskCreateTime().desc().list();
         for (Task task : tasks) {
-            System.out.println(task.toString());
         }
-        return tasks.toArray().toString();
+        System.out.println(tasks.toString());
+
+        return tasks.toString();
     }
+
 
     /**
      * 批准
@@ -77,7 +81,11 @@ public class ExpenseController {
     @RequestMapping(value = "apply")
     @ResponseBody
     public String apply(String taskId) {
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+         List<Task> t = taskService.createTaskQuery().list();
+         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        //Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
         if (task == null) {
             throw new RuntimeException("流程不存在");
         }
@@ -107,7 +115,9 @@ public class ExpenseController {
      */
     @RequestMapping(value = "processDiagram")
     public void genProcessDiagram(HttpServletResponse httpServletResponse, String processId) throws Exception {
+        List<ProcessInstance> t = runtimeService.createProcessInstanceQuery().list();
         ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(processId).singleResult();
+
 
         //流程走完的不显示图
         if (pi == null) {
@@ -133,7 +143,8 @@ public class ExpenseController {
         BpmnModel bpmnModel = repositoryService.getBpmnModel(pi.getProcessDefinitionId());
         ProcessEngineConfiguration engconf = processEngine.getProcessEngineConfiguration();
         ProcessDiagramGenerator diagramGenerator = engconf.getProcessDiagramGenerator();
-        InputStream in = diagramGenerator.generateDiagram(bpmnModel, "png", activityIds, flows, engconf.getActivityFontName(), engconf.getLabelFontName(), engconf.getAnnotationFontName(), engconf.getClassLoader(), 1.0);
+//        InputStream in = diagramGenerator.generateDiagram(bpmnModel, "png", activityIds, flows, engconf.getActivityFontName(), engconf.getLabelFontName(), engconf.getAnnotationFontName(), engconf.getClassLoader(), 1.0);
+        InputStream in = diagramGenerator.generateDiagram(bpmnModel, "png", activityIds, Collections.emptyList(),engconf.getActivityFontName(),engconf.getLabelFontName(),engconf.getAnnotationFontName(),null,1.0, false);
         OutputStream out = null;
         byte[] buf = new byte[1024];
         int legth = 0;
@@ -151,4 +162,5 @@ public class ExpenseController {
             }
         }
     }
+
 }

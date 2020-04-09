@@ -1,28 +1,43 @@
-###################  项目启动端口  ###################
+#端口 请求url
 server:
   port: 8080
-
-###################  spring配置  ###################
+  servlet:
+    context-path: /expense
+#数据库 url classname user password
 spring:
-  profiles:
-    active: dev
-##########################################################
-###################  开发环境的profile  ###################
-##########################################################
   datasource:
-    url: jdbc:mysql://47.104.7.87:3306/test1?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=GMT%2B8
+    url: jdbc:mysql://47.104.7.87:3306/flow?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=CTT
     username: root
     password: root
+  security:
+    filter:
+      dispatcher-types: REQUEST,FORWARD,ASYNC
+#在线流程图设计
+flowable:
+  #关闭定时任务JOB
+  async-executor-activate: false
+  common:
+    app:
+      idm-url: http://localhost:80/expense/
+  idm:
+    app:
+      admin:
+        user-id: admin
+        password: test
+        first-name: admin
+        last-name: admin
+  rest:
+    app:
+      authentication-mode: verify-privilege
+  modeler:
+    app:
+      rest-enabled: true
+  database-schema-update: true
+mybatis:
+  mapper-locations: classpath:/META-INF/modeler-mybatis-mappings/*.xml
+  config-location: classpath:/META-INF/mybatis-config.xml
+  configuration-properties:
+    prefix:
+    blobType: BLOB
+    boolValue: TRUE
 
-logging:
-  level.root: info
-  level.com.haiyang: debug
-  path: logs/
-  file: flowable-test.log
-
-
----
-logging:
-  level.root: warn
-  path: logs/
-  file: flowable-test.log

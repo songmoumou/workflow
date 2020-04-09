@@ -5,19 +5,16 @@ import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 为解决flowable图片中的中文乱码
- *
- * @author puhaiyang
- * @date 2018/12/19
+ * @Author: gblfy
+ * @Description: 为放置生成的流程图中中文乱码
+ * @Date: Create in 2019/11/03 10:26
  */
 @Configuration
 public class FlowableConfig implements EngineConfigurationConfigurer<SpringProcessEngineConfiguration> {
-
-
     @Override
-    public void configure(SpringProcessEngineConfiguration engineConfiguration) {
-        engineConfiguration.setActivityFontName("宋体");
-        engineConfiguration.setLabelFontName("宋体");
-        engineConfiguration.setAnnotationFontName("宋体");
+    public void configure(SpringProcessEngineConfiguration springProcessEngineConfiguration) {
+        springProcessEngineConfiguration.setActivityFontName("宋体");
+        springProcessEngineConfiguration.setLabelFontName("宋体");
+        springProcessEngineConfiguration.setAnnotationFontName("宋体");
     }
 }
